@@ -508,11 +508,13 @@ footer {
     justify-content: center;
     transition: all 0.3s ease;
     animation: whatsapp-pulse 2s infinite;
+    text-decoration: none; /* Removes underline */
 }
 
 .float-whatsapp:hover {
     background-color: #128c7e;
     transform: scale(1.1);
+    color: #fff;
 }
 
 /* Pulse Animation */
@@ -554,7 +556,6 @@ footer {
         left: -36px;
     }
 
-    /* Mobile Float Button */
     .float-whatsapp {
         width: 50px;
         height: 50px;
