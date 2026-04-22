@@ -1,96 +1,73 @@
-// Initialize AOS (Animate On Scroll)
-document.addEventListener("DOMContentLoaded", () => {
-    AOS.init({
-        duration: 800,
-        once: true,
-        offset: 100,
-    });
-});
-
-// Gallery Lightbox Functionality
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.getElementById("lightbox-img");
-const closeBtn = document.querySelector(".close-lightbox");
-const triggers = document.querySelectorAll(".lightbox-trigger");
-const prevBtn = document.querySelector(".lightbox-prev");
-const nextBtn = document.querySelector(".lightbox-next");
-
-let currentIndex = 0;
-const imagesArray = Array.from(triggers); // Convert NodeList to Array for easy indexing
-
-// Function to show a specific image
-function showImage(index) {
-    if (index >= imagesArray.length) {
-        currentIndex = 0; // Loop back to the first image
-    } else if (index < 0) {
-        currentIndex = imagesArray.length - 1; // Loop to the last image
-    } else {
-        currentIndex = index;
-    }
-    lightboxImg.src = imagesArray[currentIndex].src;
-}
-
-// Open Lightbox when clicking an image
-imagesArray.forEach((trigger, index) => {
-    trigger.addEventListener("click", function() {
-        lightbox.style.display = "flex";
-        showImage(index);
-    });
-});
-
-// Close Lightbox
-if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-        lightbox.style.display = "none";
-    });
-}
-
-// Click outside the image to close (ignoring the buttons)
-if (lightbox) {
-    lightbox.addEventListener("click", (e) => {
-        if (e.target === lightbox) {
-            lightbox.style.display = "none";
-        }
-    });
-}
-
-// Next & Previous Button Clicks
-if (prevBtn) {
-    prevBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevents the click from closing the lightbox
-        showImage(currentIndex - 1);
-    });
-}
-
-if (nextBtn) {
-    nextBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); 
-        showImage(currentIndex + 1);
-    });
-}
-
-// Keyboard Navigation (Arrows & Escape)
-document.addEventListener('keydown', function(e) {
-    if (lightbox.style.display === "flex") {
-        if (e.key === "ArrowLeft") {
-            showImage(currentIndex - 1);
-        } else if (e.key === "ArrowRight") {
-            showImage(currentIndex + 1);
-        } else if (e.key === "Escape") {
-            lightbox.style.display = "none";
-        }
-    }
-});
-
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+// ==========================================
+// 1. Smooth Scrolling for Navigation Links
+// ==========================================
+document.querySelectorAll('.nav-links a').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if(target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
+        
+        const targetId = this.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        
+        if (targetSection) {
+            targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
             });
         }
     });
+});
+
+// ==========================================
+// 2. Sticky Navigation Header on Scroll
+// ==========================================
+window.addEventListener('scroll', () => {
+    const header = document.querySelector('header');
+    
+    // Add a 'scrolled' class to the header when scrolled down 50px
+    if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
+});
+
+// ==========================================
+// 3. Lightbox Gallery Functionality
+// ==========================================
+// Create the lightbox container dynamically
+const lightbox = document.createElement('div');
+lightbox.id = 'lightbox';
+document.body.appendChild(lightbox);
+
+// Select all images that should trigger the lightbox
+const galleryImages = document.querySelectorAll('.lightbox-trigger');
+
+galleryImages.forEach(image => {
+    image.addEventListener('click', () => {
+        // Show the lightbox
+        lightbox.classList.add('active');
+        
+        // Create an image tag inside the lightbox
+        const img = document.createElement('img');
+        img.src = image.src;
+        
+        // Clear any existing images in the lightbox, then add the new one
+        while (lightbox.firstChild) {
+            lightbox.removeChild(lightbox.firstChild);
+        }
+        lightbox.appendChild(img);
+        
+        // Prevent scrolling on the body while lightbox is open
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Close the lightbox when clicking anywhere on the dark background
+lightbox.addEventListener('click', e => {
+    // Only close if clicking the background, not the image itself
+    if (e.target === e.currentTarget) {
+        lightbox.classList.remove('active');
+        // Restore page scrolling
+        document.body.style.overflow = 'auto';
+    }
 });
